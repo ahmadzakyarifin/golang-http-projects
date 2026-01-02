@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <title>Form Tambah Mahasiswa</title>
+</head>
+
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <nav class="bg-blue-600 shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <a href="/mahasiswa" class="text-white text-xl font-bold hover:text-gray-200">
+                Go Mahasiswa CRUD
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 mt-10">
+        
+        <div class="max-w-2xl mx-auto">
+
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                
+                <div class="bg-white border-b border-gray-200 px-6 py-4">
+                    <h4 class="text-xl font-bold text-gray-800">➕ Form Tambah Mahasiswa</h4>
+                </div>
+
+                <div class="p-6">
+                    <form action="/mahasiswa/create" method="POST">
+
+                        <div class="mb-4">
+                            <label for="name" class="block text-gray-700 text-sm font-bold mb-2">
+                                Nama Mahasiswa
+                            </label>
+                            <input type="text" 
+                                   id="name" 
+                                   name="name" 
+                                   required 
+                                   tabindex="1"
+                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="nim" class="block text-gray-700 text-sm font-bold mb-2">
+                                NIM
+                            </label>
+                            <input type="text" 
+                                   id="nim" 
+                                   name="nim" 
+                                   required 
+                                   tabindex="2"
+                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200">
+                        </div>
+
+                        <div class="mb-6">
+                            <label for="address" class="block text-gray-700 text-sm font-bold mb-2">
+                                Alamat
+                            </label>
+                            <textarea id="address" 
+                                      name="address" 
+                                      rows="3" 
+                                      required 
+                                      tabindex="3"
+                                      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"></textarea>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <a href="/mahasiswa" 
+                               class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200">
+                                Kembali
+                            </a>
+                            <button type="submit" 
+                                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200">
+                                Simpan
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

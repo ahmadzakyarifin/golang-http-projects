@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <title>List Mahasiswa</title>
+</head>
+
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+<nav class="bg-blue-600 shadow-lg">
+    <div class="container mx-auto px-4 py-4">
+        <a class="text-white text-xl font-bold hover:text-gray-200" href="/mahasiswa">
+            Go Mahasiswa CRUD
+        </a>
+    </div>
+</nav>
+
+<div class="container mx-auto px-4 mt-10">
+
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">📚 List Mahasiswa</h3>
+        <a href="/mahasiswa/create" 
+           class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow transition duration-200 ease-in-out">
+            + Tambah Mahasiswa
+        </a>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr class="bg-blue-100 text-blue-800 border-b-2 border-blue-200">
+                        <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                            No
+                        </th>
+                        <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                            Nama
+                        </th>
+                        <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                            NIM
+                        </th>
+                        <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                            Alamat
+                        </th>
+                        <th class="px-5 py-3 text-center text-xs font-bold uppercase tracking-wider">
+                            Aksi
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                {{ range $index, $m := .Mahasiswa }}
+                <tr class="border-b border-gray-200 hover:bg-gray-50 transition duration-150">
+                    <td class="px-5 py-4 text-sm">
+                        {{ add $index 1 }}
+                    </td>
+                    <td class="px-5 py-4 text-sm font-medium">
+                        {{ $m.Name }}
+                    </td>
+                    <td class="px-5 py-4 text-sm">
+                        {{ $m.Nim }}
+                    </td>
+                    <td class="px-5 py-4 text-sm">
+                        {{ $m.Address }}
+                    </td>
+                    <td class="px-5 py-4 text-sm flex justify-center items-center gap-2">
+                        <a href="/mahasiswa/update/{{ $m.ID }}" 
+                        class="bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-bold py-1 px-3 rounded transition duration-200">
+                            Edit
+                        </a>
+
+                        <form action="/mahasiswa/delete/{{ $m.ID }}" 
+                            method="POST"
+                            onsubmit="return confirm('Yakin?')">
+                            <button type="submit" 
+                                    class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-3 rounded transition duration-200">
+                                Hapus
+                            </button>
+                        </form>
+
+                    </td>
+                </tr>
+                {{ end }}
+                </tbody>
+            </table>
+        </div>
+        
+        {{ if not .Mahasiswa }}
+        <div class="p-5 text-center text-gray-500 text-sm">
+            Belum ada data mahasiswa.
+        </div>
+        {{ end }}
+    </div>
+
+</div>
+
+</body>
+</html>
