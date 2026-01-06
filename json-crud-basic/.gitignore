@@ -1,0 +1,13 @@
+# --- Rahasia (JANGAN DIHAPUS) ---
+.env
+
+# --- Temporary / Hasil Build ---
+# Karena kamu pakai live-reload (Air), hasil build masuk ke folder tmp
+tmp/
+
+# --- System Files ---
+.DS_Store
+Thumbs.db
+
+# --- Editor ---
+.vscode/
