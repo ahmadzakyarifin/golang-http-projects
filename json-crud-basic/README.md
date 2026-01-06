@@ -153,3 +153,80 @@ Saat pelanggan mengambil nomor antrian, nomor itu adalah identitasnya. `LastInse
 Karena datanya sudah hilang. Cukup berikan konfirmasi "Berhasil dihapus". Mengirimkan balik data yang baru saja dimusnahkan itu mubazir bandwidth.
 
 ---
+
+# Architecture Design & Pattern Explanation
+
+Dokumen ini menjelaskan alasan dibalik keputusan arsitektur yang digunakan dalam project ini (Repository, Service, dan Handler pattern), standar implementasi teknis, serta alur data (*data flow*).
+
+## 1. Repository & Service Pattern
+Pada layer Repository dan Service, kita menggunakan pendekatan **Interface** dan **Struct** yang dihubungkan dengan **Receiver Function**.
+
+### Mengapa Menggunakan Interface?
+Ketika `Main` atau layer di atasnya memanggil Repository/Service, kita mengembalikan sebuah **Interface**, bukan Struct secara langsung.
+
+* **Abstraction (Abstraksi):** Agar pemanggil (*caller*) hanya mengetahui **"apa"** yang bisa dilakukan (method apa yang tersedia), tanpa perlu tahu **"bagaimana"** caranya dilakukan (detail implementasi).
+* **Decoupling:** Memudahkan penggantian implementasi di masa depan tanpa merusak kode di layer lain.
+* **Testability:** Memudahkan proses *Unit Testing* karena Interface mudah di-*mock*.
+
+### Mengapa Mengimplementasikan dengan Struct?
+Meskipun interface bisa diimplementasikan oleh tipe data apa saja, *best practice*-nya adalah menggunakan **Struct**.
+
+* **Dependency Injection:** Kita membutuhkan tempat untuk menyimpan dependency eksternal, seperti koneksi Database (`db *sql.DB`) atau library pihak ketiga. Struct memungkinkan kita menyimpan *state* ini sebagai *field*.
+* **Receiver Function:** Di Go, untuk memenuhi kontrak Interface, kita menempelkan method-method tersebut ke Struct menggunakan *Receiver Function*.
+
+> **Pola Implementasi:**
+> 1. `Main` menginjeksi DB ke `Struct`.
+> 2. `Struct` menyimpan DB tersebut.
+> 3. `Struct` memiliki method (via `Receiver Function`) yang menggunakan DB tersebut.
+> 4. Method tersebut memenuhi syarat `Interface`.
+
+## 2. Handler Pattern
+Berbeda dengan Repository dan Service, **Handler** (Controller) berada di layer terluar. Umumnya Handler tidak wajib mengembalikan Interface, karena:
+
+* **Entry Point:** Handler tidak di-*inject* ke layer lain, melainkan dipanggil langsung oleh Router/Main.
+* **Consumer:** Tugas utama Handler adalah mengonsumsi Service. Ia bertugas menerima request, memvalidasi input, dan memformat response.
+
+## 3. Application Flow (Alur Data)
+
+Alur aplikasi berjalan secara *top-down* dari request masuk hingga ke database:
+
+1.  **Handler (Presentation Layer):**
+    * Menerima HTTP Request masuk.
+    * Melakukan *binding* dan memvalidasi **DTO** (Data Transfer Object).
+    * Jika valid, data dikirim ke Service.
+2.  **Service (Business Logic Layer):**
+    * Menerima data bersih dari Handler.
+    * Menjalankan logika bisnis (kalkulasi, validasi logic, transaksi, dll).
+    * Memanggil method yang ada di Interface Repository.
+3.  **Repository (Data Access Layer):**
+    * Menerima perintah dari Service.
+    * Menggunakan koneksi DB (yang disimpan di Struct) untuk melakukan query ke database.
+    * Mengembalikan hasil data ke Service -> Handler -> Client.
+
+---
+
+## Appendix: Analogi Konsep (The Restaurant)
+
+Bagian ini bertujuan untuk membantu pemahaman konsep teknis di atas menggunakan analogi sebuah **Restoran Profesional**.
+
+### Peran (Components)
+* **Struct = "Koki & Tas Perkakasnya"**
+    Identitas pekerja yang menyimpan alat-alat penting.
+    *(Contoh: Struct Repository menyimpan koneksi DB ibarat Koki menyimpan Pisau & Kunci Gudang).*
+* **Function New (Constructor) = "Kontrak & Serah Terima Alat"**
+    Saat manager merekrut pegawai, ia memberikan alat kerjanya.
+    *(Contoh: `NewRepository(db)` memberikan koneksi DB ke Struct agar siap kerja).*
+* **Receiver Function = "Skill Menggunakan Alat"**
+    Skill memotong daging hanya bisa dilakukan jika Koki sedang memegang pisau.
+    *(Contoh: Method `FindUser()` menempel pada Struct karena butuh koneksi DB yang ada di dalam Struct).*
+* **Interface = "Job Description"**
+    Pemilik restoran hanya peduli "Siapa yang BISA MASAK", tidak peduli siapa nama orangnya.
+    *(Contoh: Service memanggil Repository lewat Interface, agar fleksibel jika implementasi DB berubah).*
+
+### Alur Kerja (Flow)
+1.  **Handler = Pelayan (Waiter)**
+    Menerima pesanan pelanggan, cek menu (validasi DTO). Pelayan tidak memasak, hanya meneruskan pesanan valid ke Dapur.
+2.  **Service = Kepala Koki (Chef)**
+    Menerima pesanan, memikirkan resep & racikan (Business Logic). Koki tidak mengambil bahan sendiri ke gudang, dia menyuruh staff gudang.
+3.  **Repository = Penjaga Gudang**
+    Menerima perintah ambil bahan. Dia punya kunci gudang (DB Connection). Dia membuka gudang, mengambil bahan (Query SQL), dan menyerahkannya ke Koki.
